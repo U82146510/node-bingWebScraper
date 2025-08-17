@@ -1,6 +1,31 @@
 import fs, { link } from 'fs';
 import { load } from 'cheerio';
-const dorks:string[] = ['inurl:php?id=', 'inurl:asp?id='];
+const dorks: string[] = [
+    // Classic PHP/ASP pages
+    'inurl:index.php?id=',
+    'inurl:product.php?id=',
+    'inurl:view.php?id=',
+    'inurl:page.php?id=',
+    'inurl:news.php?id=',
+    'inurl:default.asp?id=',
+    'inurl:home.asp?id=',
+    
+    // Search pages / query parameters
+    'inurl:search.php?query=',
+    'inurl:search.asp?query=',
+    'inurl:catalog.php?catid=',
+    
+    // Other GET parameters that might be DB-backed
+    'inurl:user.php?uid=',
+    'inurl:login.php?redirect=',
+    'inurl:profile.php?id=',
+    
+    // Optional extensions
+    'ext:php inurl:?id=',
+    'ext:asp inurl:?id=',
+    'ext:jsp inurl:?id='
+];
+
 const pagesPerDork:number = 5;
 const delayMs:number = 2000;
 
@@ -50,6 +75,13 @@ async function scrapeBing(dork:string):Promise<string[]>{
             });
 
             const html = await res.text();
+
+            // check captcha
+            if (html.includes("Enter the characters you see") || html.includes("captcha")) {
+                console.log("⚠️ Captcha detected, stopping this dork.");
+                break;
+            }
+
             const $ = load(html);
 
             $("li.b_algo h2 a").each((_, el) => {
@@ -89,7 +121,30 @@ async function start() {
     const domains:string[] = [...new Set(allUrls)];
     fs.writeFileSync('domains.txt',domains.join('\n'))
     console.log(`✅ Done! ${domains.length} unique domains saved to domains.txt`);
-}
 
+    const parameters = [
+        'index.php?id=1',
+        'product.php?id=1',
+        'view.php?id=1',
+        'page.php?id=1',
+        'news.php?id=1',
+        'default.asp?id=1',
+        'home.asp?id=1',
+        'search.php?query=test',
+        'search.asp?query=test',
+        'catalog.php?catid=1',
+        'user.php?uid=1',
+        'login.php?redirect=1',
+        'profile.php?id=1'
+    ];
+
+    const sqlmapUrls = domains.flatMap(d =>
+    parameters.map(p => `http://${d}/${p}`)
+    );
+
+    fs.writeFileSync('sqlmap_urls.txt', sqlmapUrls.join('\n'));
+    console.log(`✅ Done! ${sqlmapUrls.length} sqlmap-ready URLs saved to sqlmap_urls.txt`);
+
+}
 
 start()
