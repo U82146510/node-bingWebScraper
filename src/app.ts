@@ -1,30 +1,41 @@
 import fs, { link } from 'fs';
 import { load } from 'cheerio';
+
+
 const dorks: string[] = [
-    // Classic PHP/ASP pages
+    // PHP
     'inurl:index.php?id=',
     'inurl:product.php?id=',
     'inurl:view.php?id=',
     'inurl:page.php?id=',
     'inurl:news.php?id=',
+    'inurl:search.php?query=',
+    'inurl:user.php?uid=',
+    'inurl:profile.php?id=',
+    'inurl:login.php?redirect=',
+    'inurl:catalog.php?catid=',
+
+    // ASP
     'inurl:default.asp?id=',
     'inurl:home.asp?id=',
-    
-    // Search pages / query parameters
-    'inurl:search.php?query=',
     'inurl:search.asp?query=',
-    'inurl:catalog.php?catid=',
-    
-    // Other GET parameters that might be DB-backed
-    'inurl:user.php?uid=',
-    'inurl:login.php?redirect=',
-    'inurl:profile.php?id=',
-    
-    // Optional extensions
-    'ext:php inurl:?id=',
-    'ext:asp inurl:?id=',
-    'ext:jsp inurl:?id='
+
+    // JSP
+    'inurl:index.jsp?id=',
+    'inurl:product.jsp?id=',
+    'inurl:view.jsp?id=',
+    'inurl:page.jsp?id=',
+    'inurl:news.jsp?id=',
+    'inurl:search.jsp?query=',
+
+    // Node/Express (no file extension)
+    'inurl:/users/',
+    'inurl:/products/',
+    'inurl:/orders/',
+    'inurl:/profile/',
+    'inurl:/search?query='
 ];
+
 
 const pagesPerDork:number = 5;
 const delayMs:number = 2000;
@@ -123,20 +134,39 @@ async function start() {
     console.log(`✅ Done! ${domains.length} unique domains saved to domains.txt`);
 
     const parameters = [
+        // PHP
         'index.php?id=1',
         'product.php?id=1',
         'view.php?id=1',
         'page.php?id=1',
         'news.php?id=1',
+        'search.php?query=test',
+        'user.php?uid=1',
+        'profile.php?id=1',
+        'login.php?redirect=1',
+        'catalog.php?catid=1',
+
+        // ASP
         'default.asp?id=1',
         'home.asp?id=1',
-        'search.php?query=test',
         'search.asp?query=test',
-        'catalog.php?catid=1',
-        'user.php?uid=1',
-        'login.php?redirect=1',
-        'profile.php?id=1'
+
+        // JSP
+        'index.jsp?id=1',
+        'product.jsp?id=1',
+        'view.jsp?id=1',
+        'page.jsp?id=1',
+        'news.jsp?id=1',
+        'search.jsp?query=test',
+
+        // Node/Express style (no extension)
+        'users/1',
+        'products/1',
+        'orders/1',
+        'search?query=test',
+        'profile/1'
     ];
+
 
     const sqlmapUrls = domains.flatMap(d =>
     parameters.map(p => `http://${d}/${p}`)
