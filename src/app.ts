@@ -35,12 +35,6 @@ const dorks: { dork: string; type: DorkType }[] = [
     { dork: 'inurl:news.jsp?id=', type: 'jsp' },
     { dork: 'inurl:search.jsp?query=', type: 'jsp' },
 
-    // Node/Express
-    { dork: 'inurl:/users/', type: 'node' },
-    { dork: 'inurl:/products/', type: 'node' },
-    { dork: 'inurl:/orders/', type: 'node' },
-    { dork: 'inurl:/profile/', type: 'node' },
-    { dork: 'inurl:/search?query=', type: 'node' }
 ];
 
 const pagesPerDork = 5;
@@ -130,7 +124,6 @@ async function start() {
     const phpParameters = ['index.php?id=1','product.php?id=1','view.php?id=1','page.php?id=1','news.php?id=1','search.php?query=test','user.php?uid=1','profile.php?id=1','login.php?redirect=1','catalog.php?catid=1'];
     const aspParameters = ['default.asp?id=1','home.asp?id=1','search.asp?query=test'];
     const jspParameters = ['index.jsp?id=1','product.jsp?id=1','view.jsp?id=1','page.jsp?id=1','news.jsp?id=1','search.jsp?query=test'];
-    const nodeParameters = ['users/1','products/1','orders/1','search?query=test','profile/1'];
 
     const sqlmapUrls: string[] = [];
 
@@ -138,7 +131,6 @@ async function start() {
         if (info.type === 'php') sqlmapUrls.push(...phpParameters.map(p => `http://${info.domain}/${p}`));
         else if (info.type === 'asp') sqlmapUrls.push(...aspParameters.map(p => `http://${info.domain}/${p}`));
         else if (info.type === 'jsp') sqlmapUrls.push(...jspParameters.map(p => `http://${info.domain}/${p}`));
-        else sqlmapUrls.push(...nodeParameters.map(p => `http://${info.domain}/${p}`));
     }
 
     fs.writeFileSync('sqlmap_urls.txt', sqlmapUrls.join('\n'));
