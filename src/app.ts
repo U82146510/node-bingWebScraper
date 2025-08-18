@@ -1,6 +1,11 @@
 import fs from 'fs';
 import { load } from 'cheerio';
 
+const pagesPerDork = 100;
+const delayMs = 9000;
+const country = "br";
+const market = "pt-BR"
+
 type DorkType = 'php' | 'asp' | 'jsp' | 'node';
 
 interface DomainInfo {
@@ -8,7 +13,7 @@ interface DomainInfo {
     type: DorkType;
 }
 
-// Define your dorks with types
+
 const dorks: { dork: string; type: DorkType }[] = [
     // PHP
     { dork: 'inurl:index.php?id=', type: 'php' },
@@ -37,8 +42,6 @@ const dorks: { dork: string; type: DorkType }[] = [
 
 ];
 
-const pagesPerDork = 5;
-const delayMs = 2000;
 
 let progress: Record<string, number> = {};
 if (fs.existsSync('progress.json')) {
@@ -72,9 +75,12 @@ async function scrapeBing(dork: string, type: DorkType): Promise<DomainInfo[]> {
     const urls: DomainInfo[] = [];
     for (let i = 0; i < pagesPerDork; i++) {
         const offset = i * 10;
-        const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(dork)}&first=${offset}`;
+        const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(dork)}&first=${offset}&cc=${country}&mkt=${market}`;
         try {
-            const res = await fetch(searchUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' } });
+            const res = await fetch(searchUrl, 
+                { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                             "Accept-Language": `${market},pt;q=0.9`
+                 } });
             const html = await res.text();
 
             if (html.includes("Enter the characters you see") || html.includes("captcha")) {
